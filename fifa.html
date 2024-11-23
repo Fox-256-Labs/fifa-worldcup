@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Matthew Kuch">
+<meta name="dcterms.date" content="2024-11-23">
+
+<title>The FIFA World Cup</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="fifa_files/libs/clipboard/clipboard.min.js"></script>
+<script src="fifa_files/libs/quarto-html/quarto.js"></script>
+<script src="fifa_files/libs/quarto-html/popper.min.js"></script>
+<script src="fifa_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="fifa_files/libs/quarto-html/anchor.min.js"></script>
+<link href="fifa_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="fifa_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="fifa_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="fifa_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="fifa_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: black;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: black;
+background: #f0f3f5;
+      }
+</style>
+
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">The FIFA World Cup</h1>
+            <p class="subtitle lead">A recreation of Tanya Shapiro’s Dataviz</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Matthew Kuch <a href="mailto:kuch.matthew@gmail.com" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 23, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#load-the-required-libraries" id="toc-load-the-required-libraries" class="nav-link active" data-scroll-target="#load-the-required-libraries"><span class="header-section-number">1</span> Load the required libraries</a></li>
+  <li><a href="#setup-the-nice-looking-fonts" id="toc-setup-the-nice-looking-fonts" class="nav-link" data-scroll-target="#setup-the-nice-looking-fonts"><span class="header-section-number">2</span> Setup the nice looking fonts</a></li>
+  <li><a href="#webscraping-wikipedia-for-the-fifa-world-cup-data" id="toc-webscraping-wikipedia-for-the-fifa-world-cup-data" class="nav-link" data-scroll-target="#webscraping-wikipedia-for-the-fifa-world-cup-data"><span class="header-section-number">3</span> Webscraping wikipedia (for the FIFA world cup data)</a>
+  <ul class="collapse">
+  <li><a href="#setting-up-a-reference-table" id="toc-setting-up-a-reference-table" class="nav-link" data-scroll-target="#setting-up-a-reference-table"><span class="header-section-number">3.1</span> Setting up a reference table</a></li>
+  <li><a href="#lets-first-get-1-table-for-1982-as-a-test-case" id="toc-lets-first-get-1-table-for-1982-as-a-test-case" class="nav-link" data-scroll-target="#lets-first-get-1-table-for-1982-as-a-test-case"><span class="header-section-number">3.2</span> Lets first get 1 table for 1982, as a test case</a></li>
+  <li><a href="#helper-function-get_table" id="toc-helper-function-get_table" class="nav-link" data-scroll-target="#helper-function-get_table"><span class="header-section-number">3.3</span> Helper Function: <code>get_table()</code></a></li>
+  <li><a href="#loop-through-all-the-years" id="toc-loop-through-all-the-years" class="nav-link" data-scroll-target="#loop-through-all-the-years"><span class="header-section-number">3.4</span> Loop through all the years</a></li>
+  <li><a href="#post-scraping-data-cleaning" id="toc-post-scraping-data-cleaning" class="nav-link" data-scroll-target="#post-scraping-data-cleaning"><span class="header-section-number">3.5</span> Post scraping data cleaning</a>
+  <ul class="collapse">
+  <li><a href="#standardize-team-names" id="toc-standardize-team-names" class="nav-link" data-scroll-target="#standardize-team-names"><span class="header-section-number">3.5.1</span> <strong>Standardize Team Names</strong>:</a></li>
+  <li><a href="#filter-frequent-participants" id="toc-filter-frequent-participants" class="nav-link" data-scroll-target="#filter-frequent-participants"><span class="header-section-number">3.5.2</span> <strong>Filter Frequent Participants</strong>:</a></li>
+  <li><a href="#group-by-geographic-region" id="toc-group-by-geographic-region" class="nav-link" data-scroll-target="#group-by-geographic-region"><span class="header-section-number">3.5.3</span> Group by geographic region</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#data-wrangling-and-transformation" id="toc-data-wrangling-and-transformation" class="nav-link" data-scroll-target="#data-wrangling-and-transformation"><span class="header-section-number">4</span> Data wrangling and transformation</a>
+  <ul class="collapse">
+  <li><a href="#prepare-the-data-for-plotting" id="toc-prepare-the-data-for-plotting" class="nav-link" data-scroll-target="#prepare-the-data-for-plotting"><span class="header-section-number">4.1</span> Prepare the data for plotting</a>
+  <ul class="collapse">
+  <li><a href="#detailed-explanation-of-the-above-code-snippet-for-df_plot" id="toc-detailed-explanation-of-the-above-code-snippet-for-df_plot" class="nav-link" data-scroll-target="#detailed-explanation-of-the-above-code-snippet-for-df_plot"><span class="header-section-number">4.1.1</span> Detailed explanation of the above code snippet for df_plot</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<p>This breadcrumb/tutorial will walk you through in detail how to recreate Tanya Shapiro’s visualization below.</p>
+<p><strong>I hope you enjoy this because at each stage of recreating this dataviz is like solving a puzzle!</strong></p>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p><img src="./assets/fifa.png" class="img-fluid figure-img"></p>
+<figcaption class="margin-caption">The goal is to recreate this</figcaption>
+</figure>
+</div>
+<p>We’re going to re-engineer the above dataviz in 6 steps:</p>
+<ol type="1">
+<li>Load the required libraries</li>
+<li>Setup the nice looking fonts</li>
+<li>Webscraping wikipedia (for the FIFA world cup data)</li>
+<li>Data wrangling and transformation (final step before visualization)</li>
+<li>Create the heatmap and polish it</li>
+<li>Add text and annotations</li>
+</ol>
+<section id="load-the-required-libraries" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Load the required libraries</h1>
+<p>To accomplish the 7 steps above, the libraries that will help us are below :</p>
+<ol type="i">
+<li><p><strong>Data manipulation and visualization</strong>: tidyverse, RColorBrewer, viridis</p></li>
+<li><p><strong>Fonts and text customization</strong>: sysfonts, showtext</p></li>
+<li><p><strong>Specialized ggplot features</strong>: geomtextpath, ggimage, ggtext</p></li>
+<li><p><strong>Webscraping:</strong> rvest</p></li>
+</ol>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sysfonts)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(showtext)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geomtextpath)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggimage)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggtext)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="setup-the-nice-looking-fonts" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Setup the nice looking fonts</h1>
+<p>The custom fonts we’ll use for different parts of the visualization are as follows:</p>
+<ul>
+<li><p>The main text font is <strong>Roboto</strong> (downloaded via Google Fonts).</p></li>
+<li><p>The title font is <strong>Cocon</strong>, which resembles FIFA branding.</p></li>
+<li><p>The caption uses <strong>Font Awesome</strong> for social media icons.</p></li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sysfonts<span class="sc">::</span><span class="fu">font_add_google</span>(<span class="st">"Roboto"</span>, <span class="st">"Roboto"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sysfonts<span class="sc">::</span><span class="fu">font_add</span>(<span class="st">"Cocon"</span>, <span class="st">"./fonts/CoconRegularFont.otf"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sysfonts<span class="sc">::</span><span class="fu">font_add</span>(<span class="st">"fb"</span>, <span class="st">"fonts/Font Awesome 6 Brands-Regular-400.otf"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">showtext_auto</span>()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>showtext<span class="sc">::</span><span class="fu">showtext_opts</span>(<span class="at">dpi =</span> <span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="webscraping-wikipedia-for-the-fifa-world-cup-data" class="level1 page-columns page-full" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Webscraping wikipedia (for the FIFA world cup data)</h1>
+<p>Now to the fun stuff, lets retrieve FIFA World Cup data from Wikipedia, using the rvest package for web scraping. The goal is to extract relevant tables from the Wikipedia pages for each tournament year.</p>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p><img src="assets/fifa-wiki-1982-url.jpg" class="img-fluid figure-img"></p>
+<figcaption class="margin-caption">URL for 1982 FIFA World Cup</figcaption>
+</figure>
+</div>
+<section id="setting-up-a-reference-table" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="setting-up-a-reference-table"><span class="header-section-number">3.1</span> Setting up a reference table</h2>
+<p>The reference table (<code>ref</code>) contains the following:</p>
+<ul>
+<li><p><strong><code>year</code></strong>: The years of the FIFA World Cup (1982–2018 in this example).</p></li>
+<li><p><strong><code>index</code></strong>: The position of the table on each year’s Wikipedia page.</p></li>
+<li><p><strong><code>host</code></strong>: The country that hosted the tournament in each year.</p></li>
+<li><p><strong><code>link</code></strong>: The URL to the Wikipedia page for each year’s tournament.</p></li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ref <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">c</span>(<span class="dv">1982</span>, <span class="dv">1986</span>, <span class="dv">1990</span>, <span class="dv">1994</span>, <span class="dv">1998</span>, <span class="dv">2002</span>, <span class="dv">2006</span>, <span class="dv">2010</span>, <span class="dv">2014</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">index =</span> <span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">14</span>, <span class="dv">15</span>, <span class="dv">13</span>, <span class="dv">25</span>, <span class="dv">24</span>, <span class="dv">23</span>, <span class="dv">14</span>, <span class="dv">20</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">host =</span> <span class="fu">c</span>(<span class="st">"Spain"</span>, <span class="st">"Mexico"</span>, <span class="st">"Italy"</span>, <span class="st">"United States"</span>, <span class="st">"France"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"South Korea"</span>, <span class="st">"Germany"</span>, <span class="st">"South Africa"</span>, <span class="st">"Brazil"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate links to all Wikipedia pages for these years</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ref<span class="sc">$</span>link <span class="ot">=</span> <span class="fu">paste0</span>(<span class="st">"https://en.wikipedia.org/wiki/"</span>, ref<span class="sc">$</span>year, <span class="st">"_FIFA_World_Cup"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>This ref table acts as a roadmap for the scraping function, specifying the exact URL and table position for each year.</p>
+</section>
+<section id="lets-first-get-1-table-for-1982-as-a-test-case" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="lets-first-get-1-table-for-1982-as-a-test-case"><span class="header-section-number">3.2</span> Lets first get 1 table for 1982, as a test case</h2>
+<p>To test our web-scraping logic, lets first scrape the 1982 table:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Get the URL and table index for the year 1982</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">=</span> ref<span class="sc">$</span>link[ref<span class="sc">$</span>year <span class="sc">==</span> <span class="dv">1982</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  index <span class="ot">=</span> ref<span class="sc">$</span>index[ref<span class="sc">$</span>year <span class="sc">==</span> <span class="dv">1982</span>]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Step 2: Scrape the table from the Wikipedia page</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">=</span> url <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_html</span>() <span class="sc">%&gt;%</span>                    <span class="co"># Read the HTML content of the page</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">html_elements</span>(<span class="st">"table.wikitable"</span>) <span class="sc">%&gt;%</span>  <span class="co"># Select all tables with the 'wikitable' class</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    .[index] <span class="sc">%&gt;%</span>                       <span class="co"># Pick the table based on the given index</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">html_table</span>() <span class="sc">%&gt;%</span>                   <span class="co"># Convert the table to a dataframe</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    .[[<span class="dv">1</span>]]                             <span class="co"># Extract the first element of the list</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Clean and format the table</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">=</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">Pos =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span>                <span class="co"># Rename the first column to 'Pos' (Position)</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Pos, Team, L, W)            <span class="co"># Keep only Position, Team, Losses, and Wins columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="helper-function-get_table" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="helper-function-get_table"><span class="header-section-number">3.3</span> Helper Function: <code>get_table()</code></h2>
+<p>The function <code>get_table(year)</code> will perform the following steps:</p>
+<ul>
+<li><p>Retrieves the appropriate URL and table index for a given <code>year</code>.</p></li>
+<li><p>Scrapes the specified table from the Wikipedia page.</p></li>
+<li><p>Renames and selects the required columns: <strong>Position (<code>Pos</code>)</strong>, <strong>Team</strong>, <strong>Losses (<code>L</code>)</strong>, and <strong>Wins (<code>W</code>)</strong>.</p></li>
+<li><p>Adds the <code>year</code> column to identify the tournament.</p></li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>get_table <span class="ot">&lt;-</span> <span class="cf">function</span>(year) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Step 1: Get the URL and table index for the year</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">=</span> ref<span class="sc">$</span>link[ref<span class="sc">$</span>year <span class="sc">==</span> year]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  index <span class="ot">=</span> ref<span class="sc">$</span>index[ref<span class="sc">$</span>year <span class="sc">==</span> year]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Step 2: Scrape the table from the Wikipedia page</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">=</span> url <span class="sc">%&gt;%</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_html</span>() <span class="sc">%&gt;%</span>                    <span class="co"># Read the HTML content of the page</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">html_elements</span>(<span class="st">"table.wikitable"</span>) <span class="sc">%&gt;%</span>  <span class="co"># Select all tables with the 'wikitable' class</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    .[index] <span class="sc">%&gt;%</span>                       <span class="co"># Pick the table based on the given index</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">html_table</span>() <span class="sc">%&gt;%</span>                   <span class="co"># Convert the table to a dataframe</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    .[[<span class="dv">1</span>]]                             <span class="co"># Extract the first element of the list</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Step 3: Clean and format the table</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">=</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">Pos =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span>                <span class="co"># Rename the first column to 'Pos' (Position)</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Pos, Team, L, W)            <span class="co"># Keep only Position, Team, Losses, and Wins columns</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Step 4: Add the year column</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  data<span class="sc">$</span>year <span class="ot">=</span> year</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(data)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Explanation of key steps</strong>:</p>
+<ul>
+<li><p><strong>Scraping with <code>read_html</code> and <code>html_elements</code>:</strong> Reads the webpage and selects all tables with the <code>wikitable</code> CSS class (a standard for tables on Wikipedia).</p></li>
+<li><p><strong>Indexing with <code>.[index]</code>:</strong> Extracts the specific table based on the <code>index</code> column in the <code>ref</code> table.</p></li>
+<li><p><strong>Converting the table with <code>html_table</code>:</strong> Converts the HTML table into a tidy dataframe.</p></li>
+<li><p><strong>Column selection and renaming:</strong> Cleans the scraped table by renaming and selecting only the required columns.</p></li>
+</ul>
+</section>
+<section id="loop-through-all-the-years" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="loop-through-all-the-years"><span class="header-section-number">3.4</span> Loop through all the years</h2>
+<p>The script below loops through all years in <code>ref$year</code>, applying <code>get_table()</code> to each year. The results are combined into a single dataframe (<code>data</code>).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize an empty dataframe</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">data.frame</span>()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through each year and scrape the corresponding data</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> ref<span class="sc">$</span>year) {</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">=</span> <span class="fu">rbind</span>(data, <span class="fu">get_table</span>(i))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove unwanted rows </span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data[<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"Eliminated in the"</span>, data<span class="sc">$</span>Pos),] <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="post-scraping-data-cleaning" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="post-scraping-data-cleaning"><span class="header-section-number">3.5</span> Post scraping data cleaning</h2>
+<section id="standardize-team-names" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="standardize-team-names"><span class="header-section-number">3.5.1</span> <strong>Standardize Team Names</strong>:</h3>
+<ul>
+<li>West Germany is relabeled as Germany for consistency.</li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Team =</span> <span class="fu">case_when</span>(Team <span class="sc">==</span> <span class="st">"West Germany"</span> <span class="sc">~</span> <span class="st">"Germany"</span>, <span class="cn">TRUE</span> <span class="sc">~</span> Team))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="filter-frequent-participants" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="filter-frequent-participants"><span class="header-section-number">3.5.2</span> <strong>Filter Frequent Participants</strong>:</h3>
+<ul>
+<li>Only keep teams that participated in at least 4 tournaments.</li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>teams <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Team) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">wc =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(wc <span class="sc">&gt;</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Purpose</strong>:</p>
+<ul>
+<li>This ensures the visualization focuses on teams with a significant history in the World Cup</li>
+</ul>
+</section>
+<section id="group-by-geographic-region" class="level3" data-number="3.5.3">
+<h3 data-number="3.5.3" class="anchored" data-anchor-id="group-by-geographic-region"><span class="header-section-number">3.5.3</span> Group by geographic region</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>geo_group <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="fu">c</span>(<span class="st">"Italy"</span>,<span class="st">"Germany"</span>,<span class="st">"England"</span>,<span class="st">"Norway"</span>,<span class="st">"Sweden"</span>,<span class="st">"Switzerland"</span>,<span class="st">"Netherlands"</span>,<span class="st">"France"</span>,<span class="st">"Belgium"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Spain"</span>,<span class="st">"Croatia"</span>,<span class="st">"Poland"</span>,<span class="st">"Portugal"</span>,<span class="st">"Denmark"</span>,<span class="st">"Russia"</span>,<span class="st">"Scotland"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"United States"</span>,<span class="st">"Argentina"</span>,<span class="st">"Brazil"</span>,<span class="st">"Paraguay"</span>,<span class="st">"Uruguay"</span>,<span class="st">"Costa Rica"</span>,<span class="st">"Colombia"</span>,<span class="st">"Chile"</span>,<span class="st">"Mexico"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Nigeria"</span>,<span class="st">"Cameroon"</span>,<span class="st">"Saudi Arabia"</span>,<span class="st">"South Korea"</span>,<span class="st">"Japan"</span>,<span class="st">"Iran"</span>,<span class="st">"Morocco"</span>,<span class="st">"Algeria"</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">geo =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"Europe"</span>,<span class="dv">16</span>), <span class="fu">rep</span>(<span class="st">"Americas"</span>,<span class="dv">9</span>), <span class="fu">rep</span>(<span class="st">"Other"</span>,<span class="dv">8</span>))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Create Factor for Continent to arrange in order</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>geo_group<span class="sc">$</span>geo<span class="ot">&lt;-</span><span class="fu">factor</span>(geo_group<span class="sc">$</span>geo, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">"Europe"</span>,<span class="st">"Americas"</span>,<span class="st">"Other"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The <code>geo_group</code> dataframe is created to group the countries (teams) into geographic regions (e.g., Europe, Americas, Other). These groupings will later be used to:</p>
+<ol type="1">
+<li><p><strong>Color-code</strong> teams by region.</p></li>
+<li><p><strong>Create section labels in the visualization</strong> (e.g., “Europe”, “Americas”, “Other”).</p></li>
+</ol>
+</section>
+</section>
+</section>
+<section id="data-wrangling-and-transformation" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Data wrangling and transformation</h1>
+<section id="prepare-the-data-for-plotting" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="prepare-the-data-for-plotting"><span class="header-section-number">4.1</span> Prepare the data for plotting</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_plot <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"Eliminated"</span>, Pos) <span class="sc">&amp;</span> Team <span class="sc">%in%</span> teams<span class="sc">$</span>Team) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(teams, <span class="at">by =</span> <span class="st">"Team"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(geo_group, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Team"</span> <span class="ot">=</span> <span class="st">"country"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ref, <span class="at">by =</span> <span class="st">"year"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(<span class="at">Team =</span> teams<span class="sc">$</span>Team) <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"Eliminated"</span>, Team)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">counter =</span> <span class="dv">1</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pos =</span> <span class="fu">as.integer</span>(Pos),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">group =</span> <span class="fu">case_when</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>           <span class="fu">is.na</span>(Pos) <span class="sc">~</span> <span class="st">"Not Present"</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>           Pos <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Win"</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>           Pos <span class="sc">&lt;=</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"Semi Finals"</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>           Pos <span class="sc">&lt;=</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">"Quarter Finals"</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>           Pos <span class="sc">&lt;=</span> <span class="dv">16</span> <span class="sc">~</span> <span class="st">"Round of 16"</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>           Pos <span class="sc">&lt;=</span> <span class="dv">32</span> <span class="sc">~</span> <span class="st">"Group Stage"</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>         )) <span class="sc">%&gt;%</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Team) <span class="sc">%&gt;%</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Team, year) <span class="sc">%&gt;%</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wc =</span> <span class="fu">sum</span>(counter[group <span class="sc">!=</span> <span class="st">"Not Present"</span>]),</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">win =</span> <span class="fu">sum</span>(counter[group <span class="sc">==</span> <span class="st">"Win"</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo, <span class="sc">-</span>wc, <span class="sc">-</span>win, Team) <span class="sc">%&gt;%</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="detailed-explanation-of-the-above-code-snippet-for-df_plot" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="detailed-explanation-of-the-above-code-snippet-for-df_plot"><span class="header-section-number">4.1.1</span> Detailed explanation of the above code snippet for df_plot</h3>
+<section id="filter-relevant-data" class="level4" data-number="4.1.1.1">
+<h4 data-number="4.1.1.1" class="anchored" data-anchor-id="filter-relevant-data"><span class="header-section-number">4.1.1.1</span> Filter Relevant Data</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter(!grepl("Eliminated", Pos) &amp; Team %in% teams$Team)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Purpose</strong>: Exclude irrelevant rows from the data.</p>
+<ul>
+<li><p><code>!grepl("Eliminated", Pos)</code>: Removes rows where the position (<code>Pos</code>) contains the word “Eliminated”.</p></li>
+<li><p><code>Team %in% teams$Team</code>: Keeps only teams that participated in more than 3 tournaments (filtered earlier in <code>teams</code>).</p></li>
+</ul>
+</section>
+<section id="join-additional-data" class="level4" data-number="4.1.1.2">
+<h4 data-number="4.1.1.2" class="anchored" data-anchor-id="join-additional-data"><span class="header-section-number">4.1.1.2</span> Join Additional Data</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># left_join(teams, by = "Team") %&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># left_join(geo_group, by = c("Team" = "country")) %&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># left_join(ref, by = "year")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Purpose</strong>: Merge additional information into the main dataframe.</p>
+<ul>
+<li><p><code>teams</code>: Adds the number of World Cups each team participated in (<code>wc</code>).</p></li>
+<li><p><code>geo_group</code>: Adds geographic groupings (e.g., Europe, Americas).</p></li>
+<li><p><code>ref</code>: Adds metadata like the tournament’s host country and year.</p></li>
+</ul>
+</section>
+<section id="group-and-ensure-all-teams-appear-each-year" class="level4" data-number="4.1.1.3">
+<h4 data-number="4.1.1.3" class="anchored" data-anchor-id="group-and-ensure-all-teams-appear-each-year"><span class="header-section-number">4.1.1.3</span> Group and Ensure All Teams Appear Each Year</h4>
+</section>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
