@@ -333,3 +333,5 @@ df_plot <- data %>%
 -   `ref`: Adds metadata like the tournament's host country and year.
 
 #### Group and Ensure All Teams Appear Each Year
+
+Lets continue from here tomorrow...
