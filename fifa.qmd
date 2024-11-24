@@ -12,7 +12,7 @@ title-block-banner-color: "black"
 
 format: html
 html:
-code-fold: true
+code-fold: false
 code-summary: "Code"
 css: style.css
 toc: true
@@ -22,7 +22,7 @@ editor: visual
 fig-cap-location: margin
 ---
 
-This breadcrumb/tutorial will walk you through in detail how to recreate Tanya Shapiro's visualization below.
+This tutorial will walk you through in detail how to recreate Tanya Shapiro's visualization below.
 
 **I hope you enjoy this because at each stage of recreating this dataviz is like solving a puzzle!**
 
@@ -39,7 +39,7 @@ We're going to re-engineer the above dataviz in 6 steps:
 
 # Load the required libraries
 
-To accomplish the 7 steps above, the libraries that will help us are below :
+To accomplish the 6 steps above, the libraries that will help us are below :
 
 i.  **Data manipulation and visualization**: tidyverse, RColorBrewer, viridis
 
@@ -48,6 +48,8 @@ ii. **Fonts and text customization**: sysfonts, showtext
 iii. **Specialized ggplot features**: geomtextpath, ggimage, ggtext
 
 iv. **Webscraping:** rvest
+
+v.  **Creating data tables:** DT
 
 ```{r warning=FALSE, message=FALSE}
 
@@ -60,6 +62,7 @@ library(geomtextpath)
 library(ggimage)
 library(ggtext)
 library(rvest)
+library(DT)
 
 ```
 
@@ -113,6 +116,9 @@ ref = data.frame(
 # Generate links to all Wikipedia pages for these years
 ref$link = paste0("https://en.wikipedia.org/wiki/", ref$year, "_FIFA_World_Cup")
 
+# Visualize the reference table 
+datatable(ref, filter = "top")
+
 ```
 
 This ref table acts as a roadmap for the scraping function, specifying the exact URL and table position for each year.
@@ -128,7 +134,7 @@ To test our web-scraping logic, lets first scrape the 1982 table:
   index = ref$index[ref$year == 1982]
   
   # Step 2: Scrape the table from the Wikipedia page
-  data = url %>%
+  data_1982 = url %>%
     read_html() %>%                    # Read the HTML content of the page
     html_elements("table.wikitable") %>%  # Select all tables with the 'wikitable' class
     .[index] %>%                       # Pick the table based on the given index
@@ -137,10 +143,14 @@ To test our web-scraping logic, lets first scrape the 1982 table:
 
   
 # Step 3: Clean and format the table
-  data = data %>%
+  data_1982 = data_1982 %>%
     rename(Pos = 1) %>%                # Rename the first column to 'Pos' (Position)
     select(Pos, Team, L, W)            # Keep only Position, Team, Losses, and Wins columns
   
+# Visualization the 1982 data table
+  
+datatable(data_1982, filter = "top")
+
 ```
 
 ## Helper Function: `get_table()`
@@ -206,8 +216,9 @@ for (i in ref$year) {
   data = rbind(data, get_table(i))
 }
 
-# Remove unwanted rows 
-data <- data[!grepl("Eliminated in the", data$Pos),] %>% na.omit()  
+# Visualize data table
+datatable(data, filter = "top")
+ 
 
 ```
 
@@ -233,6 +244,8 @@ teams <- data %>%
   summarise(wc = n()) %>%
   filter(wc > 3)
 
+# Visualize teams
+datatable(teams, filter = "top")
 ```
 
 **Purpose**:
@@ -255,7 +268,8 @@ geo_group <- data.frame(
 #Create Factor for Continent to arrange in order
 geo_group$geo<-factor(geo_group$geo, levels=c("Europe","Americas","Other"))
 
-
+# Visualize geo grouping table
+datatable(geo_group, filter = "top")
 ```
 
 The `geo_group` dataframe is created to group the countries (teams) into geographic regions (e.g., Europe, Americas, Other). These groupings will later be used to:
@@ -296,6 +310,8 @@ df_plot <- data %>%
   arrange(geo, -wc, -win, Team) %>%
   ungroup()
 
+# Visualize
+datatable(df_plot, filter = "top")
 ```
 
 ### Detailed explanation of the above code snippet for df_plot
@@ -333,5 +349,264 @@ df_plot <- data %>%
 -   `ref`: Adds metadata like the tournament's host country and year.
 
 #### Group and Ensure All Teams Appear Each Year
+
+```{r}
+# group_by(year) %>% complete(Team = teams$Team)
+
+```
+
+**Purpose**: Ensure every team that meets the criteria (`teams$Team`) is listed for every tournament year, even if they didn't participate.
+
+-   `complete(Team = teams$Team)`: Adds missing rows for teams not present in certain years, filling them with `NA`.
+
+#### Filter Out Invalid Teams
+
+```{r}
+
+# filter(!grepl("Eliminated", Team))
+
+```
+
+**Purpose**: Removes any false rows where `Team` is incorrectly filled with "Eliminated" or similar.
+
+#### Add New Columns
+
+```{r}
+
+# mutate(counter = 1,
+       #Pos = as.integer(Pos),
+       #group = case_when(
+         #is.na(Pos) ~ "Not Present",
+         #Pos == 1 ~ "Win",
+         #Pos <= 4 ~ "Semi Finals",
+         #Pos <= 8 ~ "Quarter Finals",
+         #Pos <= 16 ~ "Round of 16",
+         #Pos <= 32 ~ "Group Stage"
+       #))
+
+```
+
+**Purpose**: Create additional columns for further analysis and visualization.
+
+-   `counter = 1`: Adds a simple counter for each row, used to calculate summaries later.
+
+-   `Pos = as.integer(Pos)`: Converts `Pos` to an integer for easier comparisons.
+
+-   `group`: Categorizes teams into performance groups:
+
+    -   `is.na(Pos)`: If `Pos` is `NA`, the team did not participate (`"Not Present"`).
+
+    -   `Pos == 1`: Winner (`"Win"`).
+
+    -   `Pos <= 4`: Reached the semifinals (`"Semi Finals"`).
+
+    -   `Pos <= 8`: Reached the quarterfinals (`"Quarter Finals"`).
+
+    -   `Pos <= 16`: Reached the round of 16 (`"Round of 16"`).
+
+    -   `Pos <= 32`: Played in the group stage (`"Group Stage"`).
+
+#### Summarize Performance by Team
+
+```{r}
+
+# group_by(Team) %>%
+# arrange(Team, year) %>%
+# mutate(wc = sum(counter[group != "Not Present"]),
+       # win = sum(counter[group == "Win"]))
+
+```
+
+**Purpose**: Calculate aggregate statistics for each team.
+
+-   `wc`: Total number of tournaments the team participated in (excludes `"Not Present"` years).
+
+-   `win`: Total number of tournaments won by the team.
+
+#### Sort Data
+
+```{r}
+
+# arrange(geo, -wc, -win, Team)
+
+```
+
+**Purpose**: Organize the dataset for visualization.
+
+-   `geo`: Groups teams by geographic region (Europe, Americas, Other).
+
+-   `-wc`: Within each group, sort teams by the number of tournaments participated in, in descending order.
+
+-   `-win`: Further sort teams by the number of wins, in descending order.
+
+-   `Team`: Finally, sort alphabetically by team name.
+
+#### Ungroup
+
+```{r}
+
+# ungroup()
+
+```
+
+**Purpose**: Remove grouping structure so that subsequent operations can work on the entire dataframe
+
+## Pre-visualization positioning of teams on y-axis and assigning accessible color palettes, plus other adjustments
+
+### Create Unique Y Positions
+
+```{r}
+
+df_pos <- df_plot |> 
+  distinct(Team) |> 
+  mutate(y_pos = row_number())
+
+datatable(df_pos, filter = "top")
+```
+
+#### What This Does:
+
+-   **`distinct(Team)`**:
+
+    -   Extracts a unique list of all teams from the `df_plot` dataframe.
+
+    -   This ensures that each team appears only once in the resulting `df_pos` dataframe.
+
+-   **`mutate(y_pos = row_number())`**:
+
+    -   Assigns a unique numeric value (`row_number()`) to each team. This value will determine the team's vertical position (`y_pos`) on the heatmap.
+
+### Merge the Y Positions Back to the Main Dataset
+
+```{r}
+
+df_plot <- df_plot |> 
+  left_join(df_pos, by = "Team")
+
+datatable(df_plot, filter = "top")
+```
+
+#### What This Does:
+
+-   **`left_join(df_pos, by = "Team")`**:
+
+    -   Combines the `df_pos` dataframe (which contains the unique `y_pos` values) back into the original `df_plot` dataframe.
+
+    -   For each row in `df_plot`, it looks up the corresponding `y_pos` based on the `Team` column and adds it.
+
+#### Why This Is Needed:
+
+-   This step ensures that every row in `df_plot` (which contains multiple entries per team for each World Cup year) now includes the `y_pos` value to determine its vertical position in the heatmap.
+
+### Adjust Y Positions for Spacing Between Geographic Groups
+
+```{r}
+
+df_plot$y_pos <- ifelse(df_plot$y_pos < 16, df_plot$y_pos, df_plot$y_pos + 1)
+df_plot$y_pos <- ifelse(df_plot$y_pos < 26, df_plot$y_pos, df_plot$y_pos + 1)
+
+```
+
+#### What This Does:
+
+-   Adds blank space between different geographic regions (e.g., Europe, Americas, Other) in the heatmap.
+
+-   **How It Works**:
+
+    -   `ifelse(condition, value_if_true, value_if_false)` checks a condition and applies the appropriate value for each row.
+
+    -   The logic:
+
+        -   If `y_pos < 16`, leave it unchanged (`df_plot$y_pos` remains the same).
+
+        -   Otherwise, increase the `y_pos` value by 1.
+
+        -   Repeat the process for `y_pos < 26` to introduce additional spacing.
+
+#### Why This Is Needed:
+
+-   Creates visual separation between teams from different geographic groups in the heatmap.
+
+### Create a Factor for Achievement Groups
+
+```{r}
+
+df_plot$group <- factor(df_plot$group, 
+                        levels = c("Not Present", "Group Stage", "Round of 16", "Quarter Finals", "Semi Finals", "Win"))
+
+```
+
+#### What This Does:
+
+-   Converts the `group` column (team performance categories) into an **ordered factor** with the specified levels.
+
+#### Why This Is Needed:
+
+-   Factors in R allow you to define the order of categories explicitly.
+
+-   By ordering the levels, the heatmap will display the groups (e.g., "Not Present", "Group Stage") in a consistent order, instead of defaulting to alphabetical order.
+
+#### Levels Explanation:
+
+The performance levels are arranged from lowest to highest:
+
+1.  `"Not Present"`: Team did not participate.
+
+2.  `"Group Stage"`: Team was eliminated in the group stage.
+
+3.  `"Round of 16"`: Team reached the round of 16.
+
+4.  `"Quarter Finals"`: Team reached the quarterfinals.
+
+5.  `"Semi Finals"`: Team reached the semifinals.
+
+6.  `"Win"`: Team won the tournament.
+
+### Define a Color Palette
+
+```{r}
+
+pal <- viridis(n = 5, option = "viridis")[1:5]
+
+```
+
+#### What This Does:
+
+-   **`viridis(n = 5, option = "viridis")`**:
+
+    -   Generates a set of 5 colors using the `viridis` color palette, which is known for being visually appealing and colorblind-friendly.
+
+    -   The colors are used to represent different achievement levels in the heatmap.
+
+-   **`[1:5]`**:
+
+    -   Selects the first 5 colors from the palette.
+
+#### Why This Is Needed:
+
+-   The `pal` object will be used later in the `scale_fill_manual()` function to map performance groups to specific colors.
+
+### Manually Adjust for 2002 (South Korea and Japan Hosting)
+
+```{r}
+df_plot$host[df_plot$Team == "Japan" & df_plot$year == 2002] <- "Japan"
+
+```
+
+#### What This Does:
+
+-   **Purpose**: Corrects the `host` column for the year 2002, where both South Korea and Japan co-hosted the tournament.
+
+-   **Logic**:
+
+    -   Filters rows where `Team == "Japan"` and `year == 2002`.
+
+    -   Sets the `host` value for those rows to `"Japan"`.
+
+#### Why This Is Needed:
+
+-   In 2002, South Korea and Japan were co-hosts, which is unusual for the World Cup. By default, the data may have assigned hosting to South Korea only, so this step ensures that Japan is also correctly marked as a host.
+
+# Create the heatmap and polish it
 
 Lets continue from here tomorrow...

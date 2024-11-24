@@ -1,5 +1,0 @@
-"0","sysfonts::font_add(""fb"", ""./fonts/fa-regular-400.otf"")
-"
-"2","Error in check_font_path(regular, ""regular"") : 
-  font file not found for 'regular' type
-"
