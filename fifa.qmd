@@ -609,4 +609,41 @@ df_plot$host[df_plot$Team == "Japan" & df_plot$year == 2002] <- "Japan"
 
 # Create the heatmap and polish it
 
+```{r}
+
+plot <- ggplot(data = df_plot, mapping = aes(x = as.character(year), y = y_pos, fill = group)) +
+  geom_tile(color = "white", width = 0.9, height = 0.9) +
+  geom_point(inherit.aes = FALSE, 
+             data = df_plot %>% filter(Team == host), 
+             mapping = aes(x = as.character(year), y = y_pos), 
+             shape = 21, fill = "white", color = "grey20", size = 3) +
+  annotate(geom = "text", x = "2006", y = -0.5, label = "Hosted", family = "Roboto", size = 2.75) +
+  geom_segment(mapping = aes(x = "2006", xend = "2006", y = -0.1, yend = 0.85), 
+               linewidth = 0.1, arrow = arrow(length = unit(0.05, "in"))) +
+  geom_text(mapping = aes(label = Team, y = y_pos, x = -5), size = 3, hjust = 0, color = "#909090", family = "Roboto") +
+  geomtextpath::geom_textsegment(mapping = aes(label = "Europe", x = -6, xend = -6, y = 15, yend = 1), family = "Roboto", fontface = "bold") +
+  geomtextpath::geom_textsegment(mapping = aes(label = "Americas", x = -6, xend = -6, y = 25, yend = 17), family = "Roboto", fontface = "bold") +
+  geomtextpath::geom_textsegment(mapping = aes(label = "Other", x = -6, xend = -6, y = 36, yend = 27), family = "Roboto", fontface = "bold") +
+  scale_x_discrete(breaks = as.character(unique(df_plot$year)), 
+                   expand = expansion(mult = c(1.5, 0.1), add = c(1, 1))) +
+  scale_y_reverse(breaks = seq(0, 36, by = 1), limits = c(37.2, -2), expand = c(0, 0)) +
+  scale_fill_manual(values = c("grey90", pal), 
+                    guide = guide_legend(ncol = 1, override.aes = list(width = 0.6, height = 0.6))) +
+  coord_equal() +
+  labs(x = "", y = "", fill = "Top Achievement") +
+  theme_void() +
+  theme(text = element_text(family = "Roboto"),
+        plot.title = element_text(face = "bold"),
+        legend.position = "none",
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 6),
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 8, angle = 90, family = "Roboto"),
+        axis.ticks = element_blank(),
+        panel.background = element_blank())
+plot
+```
+
+The code above creates an initial heatmap that looks almost fully baked, but needs a few more tweaks
+
 Lets continue from here tomorrow...
