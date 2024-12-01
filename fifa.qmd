@@ -745,4 +745,199 @@ Before we do the additional tweaking, lets walkthrough what each chunk of code a
 
     -   **`arrow = arrow(...)`**: Draws the arrowhead.
 
-Lets continue from here tomorrow...
+### Add Team names
+
+```{r}
+# geom_text(mapping = aes(label = Team, y = y_pos, x = -5), size = 3, hjust = 0, color = "#909090", family = "Roboto")
+
+```
+
+**Purpose**: Displays team names on the y-axis.
+
+-   **`label = Team`**: Specifies the text (team names) to display.
+
+-   **`y = y_pos, x = -5`**: Positions the text at the corresponding **`y_pos`**, with some spacing on the left.
+
+-   **`size = 3`**: Sets the font size.
+
+-   **`hjust = 0`**: Left-aligns the text.
+
+-   **`color = "#909090"`**: Sets the text color to grey.
+
+-   **`family = "Roboto"`**: Uses the Roboto font.
+
+### Add Geographic Group Labels
+
+```{r}
+# geomtextpath::geom_textsegment(mapping = aes(label = "Europe", x = -6, xend = -6, y = 15, yend = 1), family = "Roboto", fontface = "bold")
+
+```
+
+**Purpose**: Adds labels for geographic groupings (e.g., "Europe", "Americas").
+
+-   **`geomtextpath::geom_textsegment`**: Creates a text label along a line.
+
+-   **`label = "Europe"`**: Specifies the text for the label.
+
+-   **`x = -6, xend = -6, y = 15, yend = 1`**: Positions the line vertically to cover the region.
+
+-   **`family = "Roboto"`**: Sets the font family.
+
+-   **`fontface = "bold"`**: Makes the text bold
+
+### Customize scales
+
+```{r}
+
+# scale_x_discrete(breaks = as.character(unique(df_plot$year)), expand = expansion(mult = c(1.5, 0.1), add = c(1, 1)))
+# scale_y_reverse(breaks = seq(0, 36, by = 1), limits = c(37.2, -2), expand = c(0, 0))
+
+```
+
+-   **Purpose**: Adjusts the x-axis and y-axis scales.
+
+    -   **`scale_x_discrete`**: Ensures proper spacing for the years on the x-axis.
+
+    -   **`scale_y_reverse`**: Reverses the y-axis so higher numbers are at the bottom.
+
+    -   **`expand`**: Adds extra space around the plot for better alignment.
+
+### Customize fill colors
+
+```{r}
+
+# scale_fill_manual(values = c("grey90", pal), guide = guide_legend(ncol = 1, override.aes = list(width = 0.6, height = 0.6)))
+
+```
+
+-   **Purpose**: Maps colors to performance groups and customizes the legend.
+
+    -   **`values = c("grey90", pal)`**: Specifies the color palette (**`pal`** is predefined earlier).
+
+    -   **`guide`**: Adjusts the legend display (e.g., one column layout).
+
+### Apply themes
+
+```{r}
+# theme_void() +
+# theme(text = element_text(family = "Roboto"),
+      # plot.title = element_text(face = "bold"),
+      # legend.position = "none",
+      # axis.text.x = element_text(size = 8, angle = 90, family = "Roboto"),
+      # axis.text.y = element_blank(),
+      # axis.ticks = element_blank(),
+      # panel.background = element_blank())
+
+```
+
+-   **Purpose**: Removes unnecessary elements and applies styling.
+
+    -   **`theme_void()`**: Removes all default plot elements (gridlines, axes, etc.).
+
+    -   **`text = element_text(family = "Roboto")`**: Sets the default font.
+
+    -   **`legend.position = "none"`**: Hides the legend.
+
+    -   **`axis.text.x`**: Displays x-axis labels rotated vertically.
+
+    -   **`axis.text.y`**, **`axis.ticks`**: Hides the y-axis labels and ticks.
+
+# Add text and annotations
+
+## Create text 
+
+```{r}
+
+#create title text - used with ggtext::geom_textbox
+
+fifa_text<- "The FIFA World Cup, started in 1930, is an international football competition that takes place every four years. The analysis looks at the span of FIFA competitions between 1978 and 2018, tracking teams that participated in a minimum of 4 tournaments."
+
+fifa_text2<-"It is important to note that the format of the competition and number of teams admitted has changed over time. In 1982, a total of 24 teams participated, and in subsequent tournaments, FIFA expanded the tournament to admit 32 teams. The Round of 16 was not introduced until 1986 - to standardize comparison, teams that achieved a ranking of at least 16 in competitions before 1986 were grouped as Round of 16. "
+
+fifa_text3<-"Graphic groups teams by geographic location. The other grouping combines teams from Asia, Africa, and Australia. Between 1950 and 1990, Germany competed as two entities, West Germany and East Germany (result of the 1945 division). East Germany participated once in 1974. To standardize analysis, West Germany is relabeled as Germany for both 1982 and 1990 tournaments."
+```
+
+## Create a custom legend
+
+```{r}
+
+#create df for custom legend (positions relative to new plot creating in next step)
+df_legend<-data.frame(x= rep(seq(3.38, 5, by=.6),2),
+                      y= c(rep(2.1, 3),rep(1.95,3)),
+                      label=c("Not Present","Group Stage", "Round of 16","Quarter Finals","Semi Finals","Winner"),
+                      color = c("grey90",pal))
+```
+
+...
+
+## Helper function to make image transparent
+
+```{r}
+
+#Adding alpha function to geom_image
+
+#solution from: https://stackoverflow.com/questions/60820565/is-there-a-way-to-add-an-alpha-value-within-geom-image-in-ggplot
+transparent <- function(img) {
+  magick::image_fx(img, expression = "0.1*a", channel = "alpha")
+}
+```
+
+....
+
+## The code to add the text and annotations
+
+```{r}
+title <- paste0(
+  "<span style='font-family:Cocon;font-size:28pt;'>**FIFA WORLD CUP**</span><br><br>",
+  "<span style='font-face:CA;font-size:11pt;color:#545454;'>", fifa_text, "</span><br><br>",
+  "<span style='font-face:Roboto;font-size:11pt;color:#545454;'>", fifa_text2, "</span><br><br>",
+  "<span style='font-face:Roboto;font-size:11pt;color:#545454;'>", fifa_text3, "</span>"
+)
+
+caption <- paste0(
+  "<span style='font-family:Roboto;padding-right:10px;'>Source: Wikipedia</span>",
+  "<span style='color:#ffffff;'>.....</span>",
+  "<span style='font-family:fb;'>&#xf099;</span>",
+  "<span style='font-family:Roboto;'>@tanya_shapiro</span>",
+  "<span style='color:#ffffff;'>...</span>",
+  "<span style='font-family:fb;'>&#xf09b;</span>",
+  "<span style='font-family:Roboto;'> tashapiro </span>"
+)
+
+
+```
+
+## Final plot
+
+```{r warning=FALSE, message=FALSE}
+#Final Plot (note: positioning of layers was very experimental, hindsight would set scales from 0 to n)
+ggplot()+
+  #add in tile heatmap
+  annotation_custom(ggplotGrob(plot), xmin=3, xmax=8.5, ymin=1.25, ymax=4.75)+
+  #add ball image 
+  geom_image(mapping=aes(x=3.3, y=4.5, image="./assets/ball.png"), image_fun = transparent, size=.4)+
+  #add plot title
+  geom_textbox(mapping=aes(x=3.3, y=4.5, label=title), hjust=0, vjust=1, box.size=NA, fill=NA,  width = unit(4, "inch"))+
+  #add caption
+  geom_textbox(mapping=aes(x=3.3, y=1.25, label=caption), size=3, color="#6E6E6E", hjust=0, vjust=1, box.size=NA, fill=NA,  width = unit(3.5, "inch"))+
+  #add custom legend
+  geom_text(mapping=aes(x=3.35, y=2.25, label="Best Achievement"), hjust=0, family="Roboto", fontface="bold")+
+  geom_text(data=df_legend, mapping=aes(x=x+.08, y=y, label=label), hjust=0, family="Roboto", size=3.5)+
+  geom_point(data=df_legend, mapping=aes(x=x, y=y, color=I(color)), shape=15, size=6)+
+  scale_x_continuous(limits=c(3,7), expand=c(0,0))+
+  scale_y_continuous(limits=c(1,5), expand=c(0,0))+
+  coord_equal()+
+  theme_void()
+
+```
+
+## Save the final image
+
+```{r}
+#save
+# ggsave("fifa_draft.png", bg="white" , height=9, width=9, units="in")
+```
+
+![Final image output](fifa_draft.png)
+
+This final image is close enough to the original image, and we learnt alot in the process.
