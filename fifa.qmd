@@ -844,7 +844,7 @@ Before we do the additional tweaking, lets walkthrough what each chunk of code a
 
 # Add text and annotations
 
-## Create text 
+## Create text
 
 ```{r}
 
@@ -868,7 +868,48 @@ df_legend<-data.frame(x= rep(seq(3.38, 5, by=.6),2),
                       color = c("grey90",pal))
 ```
 
-...
+### **Purpose of the `df_legend` Dataframe**
+
+The **`df_legend`** dataframe is created to define the **positions, labels, and colors** for the custom legend displayed in the plot.
+
+Each row in **`df_legend`** corresponds to a legend item:
+
+-   **`x`** and **`y`**: The position of the legend items on the plot.
+
+-   **`label`**: The name of each performance category (e.g., "Not Present", "Group Stage").
+
+-   **`color`**: The corresponding color for each performance category (e.g., grey for "Not Present").
+
+This custom legend is manually positioned and styled to fit seamlessly into the visualization.
+
+### **Breakdown of the Code**
+
+#### **a. `x` Column**
+
+```{r}
+# x = rep(seq(3.38, 5, by = 0.6), 2)
+
+```
+
+-   **Purpose**: Specifies the x-coordinates (horizontal positions) for the legend items.
+
+-   **How It Works**:
+
+    -   **`seq(3.38, 5, by = 0.6)`**: Generates a sequence of numbers starting at 3.38, ending at 5, with a step size of 0.6. This creates positions for the first 3 legend items
+
+    ```{r}
+    # seq(3.38, 5, by = 0.6)
+    # Output: [3.38, 3.98, 4.58]
+
+    ```
+
+-   `rep(..., 2)`: Repeats the sequence twice, one for each row of labels (the first 3 items go in the first row, and the next 3 items go in the second row).
+
+    ```{r}
+    # rep(seq(3.38, 5, by = 0.6), 2)
+    # Output: [3.38, 3.98, 4.58, 3.38, 3.98, 4.58]
+
+    ```
 
 ## Helper function to make image transparent
 
@@ -882,7 +923,48 @@ transparent <- function(img) {
 }
 ```
 
-....
+### **Context**
+
+The purpose of this code chunk is to create a custom function, **`transparent`**, that applies transparency (alpha) to an image used in a ggplot visualization. The image will later be added to the plot using **`geom_image`**.
+
+### **Code Breakdown**
+
+#### **a. Define the Function**
+
+```{r}
+#transparent <- function(img) {
+  #magick::image_fx(img, expression = "0.1*a", channel = "alpha")
+#}
+
+```
+
+**What This Does:**
+
+1.  **`magick::image_fx`**:
+
+    -   Part of the **`magick`** package, which provides tools for manipulating images in R.
+
+    -   The **`image_fx`** function applies pixel-wise operations on an image.
+
+2.  **Parameters of `image_fx`**:
+
+    -   **`img`**: The input image, typically loaded into R from a file or URL.
+
+    -   **`expression = "0.1*a"`**:
+
+        -   Specifies the mathematical operation to apply to each pixel.
+
+        -   **`a`** stands for the alpha (transparency) channel of the image.
+
+        -   **`"0.1*a"`** multiplies the current alpha value by **`0.1`**, making the image 10% opaque (90% transparent).
+
+    -   **`channel = "alpha"`**:
+
+        -   Targets the alpha channel, which controls the transparency of the image
+
+#### **b. Why This Function is Needed**
+
+By default, **`geom_image`** from the **`ggimage`** package does not support setting an alpha value directly on the image. This function preprocesses the image to make it transparent before passing it to **`geom_image`**.
 
 ## The code to add the text and annotations
 
@@ -907,6 +989,30 @@ caption <- paste0(
 
 ```
 
+-   **Purpose**: Constructs the styled text for the title and caption.
+
+    -   **`paste0`**: Combines strings to form the final HTML-styled title.
+
+    -   HTML-like styling is used:
+
+        -   **`<span style='font-family:Cocon;font-size:28pt;'>`**: Sets the font family to "Cocon" and font size to 28pt for the main title.
+
+        -   **`<br><br>`**: Inserts line breaks to space out sections.
+
+        -   **`fifa_text`**, **`fifa_text2`**, **`fifa_text3`**: Includes descriptive text about the visualization.
+
+        -   **`Source: Wikipedia`**: Attribution for the data source.
+
+        -   **`<span style='color:#ffffff;'>.....</span>`**: Adds invisible spacing (white dots).
+
+        -   **`&#xf099;`**: Unicode character for a Twitter icon (using Font Awesome).
+
+        -   **`@tanya_shapiro`**: The creator's Twitter handle.
+
+        -   **`&#xf09b;`**: Unicode character for a GitHub icon.
+
+        -   **`tashapiro`**: The creator's GitHub handle.
+
 ## Final plot
 
 ```{r warning=FALSE, message=FALSE}
@@ -930,6 +1036,124 @@ ggplot()+
   theme_void()
 
 ```
+
+### Explaining some of the above final good chunks
+
+#### Add in heatmap
+
+```{r}
+
+# annotation_custom(ggplotGrob(plot), xmin = 3, xmax = 8.5, ymin = 1.25, ymax = 4.75)
+
+```
+
+The purpose of this code is to **embed a heatmap (stored as `plot`) within a larger ggplot visualization**. The `annotation_custom()` function is used to place the pre-created heatmap in a specific area of the overall plot.
+
+##### **i. `annotation_custom()`**
+
+-   Adds a **custom annotation layer** to the ggplot. It can include any grob (graphical object) and allows precise control over its placement.
+
+##### **ii. `ggplotGrob(plot)`**
+
+-   Converts the **`plot`** object (a ggplot heatmap created earlier in the script) into a **grob** (graphical object). This conversion is necessary because **`annotation_custom()`** works with grobs rather than ggplot objects.
+
+#### Add title to the plot
+
+```{r}
+
+#geom_textbox(mapping = aes(x = 3.3, y = 4.5, label = title),
+             #hjust = 0, vjust = 1, box.size = NA, fill = NA, width = unit(4, "inch"))
+
+```
+
+**Purpose**: Adds the styled title text to the plot.
+
+-   **`x = 3.3, y = 4.5`**: Positions the title text.
+
+-   **`label = title`**: Specifies the title text to display.
+
+-   **`hjust = 0`**: Left-aligns the text.
+
+-   **`vjust = 1`**: Vertically aligns the top of the text box with **`y = 4.5`**.
+
+-   **`box.size = NA, fill = NA`**: Removes the text box border and background.
+
+-   **`width = unit(4, "inch")`**: Limits the width of the text to 4 inches.
+
+#### Add caption to the plot
+
+```{r}
+# geom_textbox(mapping = aes(x = 3.3, y = 1.25, label = caption),
+             # size = 3, color = "#6E6E6E", hjust = 0, vjust = 1, box.size = NA, fill = NA, width = unit(3.5, "inch"))
+
+```
+
+**Purpose**: Adds the caption text at the bottom of the plot.
+
+-   **`x = 3.3, y = 1.25`**: Positions the caption.
+
+-   **`label = caption`**: Specifies the caption text to display.
+
+-   **`size = 3`**: Sets the font size.
+
+-   **`color = "#6E6E6E"`**: Sets the text color to grey.
+
+-   **`hjust = 0, vjust = 1`**: Aligns the text box to the left and top of the specified position.
+
+-   **`width = unit(3.5, "inch")`**: Restricts the width of the text to 3.5 inches.
+
+#### Add legend title
+
+```{r}
+# geom_text(mapping = aes(x = 3.35, y = 2.25, label = "Best Achievement"),
+          # hjust = 0, family = "Roboto", fontface = "bold")
+
+```
+
+-   **Purpose**: Adds the legend title ("Best Achievement").
+
+    -   **`x = 3.35, y = 2.25`**: Positions the legend title.
+
+    -   **`label = "Best Achievement"`**: Specifies the text to display.
+
+    -   **`hjust = 0`**: Left-aligns the text.
+
+    -   **`family = "Roboto"`**: Sets the font family to Roboto.
+
+    -   **`fontface = "bold"`**: Makes the text bold.
+
+#### Add legend Items
+
+```{r}
+
+# geom_text(data = df_legend, mapping = aes(x = x + 0.08, y = y, label = label), hjust = 0, family = "Roboto", size = 3.5) +
+# geom_point(data = df_legend, mapping = aes(x = x, y = y, color = I(color)), shape = 15, size = 6)
+
+```
+
+-   **Purpose**: Creates the custom legend with colored boxes and text labels.
+
+    -   **Text Labels**:
+
+        -   **`data = df_legend`**: Uses a separate dataframe (**`df_legend`**) for the legend items.
+
+        -   **`x = x + 0.08, y = y`**: Adjusts the position of the labels slightly to the right of the colored boxes.
+
+        -   **`label = label`**: Specifies the text for each legend item (e.g., "Winner", "Quarter Finals").
+
+        -   **`hjust = 0`**: Left-aligns the text.
+
+        -   **`family = "Roboto"`**: Sets the font family.
+
+        -   **`size = 3.5`**: Sets the font size.
+
+    -   **Colored Boxes**:
+
+        -   **`aes(x = x, y = y, color = I(color))`**: Maps the **`x`**, **`y`**, and color for each legend item.
+
+        -   **`shape = 15`**: Uses a square shape for the legend items.
+
+        -   **`size = 6`**: Sets the size of the boxes.
 
 ## Save the final image
 
